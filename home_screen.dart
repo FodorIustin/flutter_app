@@ -1,64 +1,82 @@
-// Copyright 2023 eduhoratiu <https://eduhoratiu.com/>
-// Use of this source code is governed by an MIT-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/material.dart';
-
 import '../common/strings.dart' as strings;
 
-/// The home screen of the app.
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Add an AppBar widget with a title and actions
       appBar: AppBar(
-        backgroundColor: Colors.purple.shade200,
+        backgroundColor: Colors.purple,
         title: const Text(strings.homeScreenTitle),
-        actions: <Widget>[
-          // Add the copy icon button
+        actions: [
           IconButton(
             onPressed: () {
-              print('Copy button pressed');
+              showSearch(context: context, delegate: DataSearch());
             },
-            icon: const Icon(Icons.content_copy),
+            icon: Icon(Icons.search),
           ),
-
-          // Add the search icon button
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.search),
+            icon: Icon(Icons.paste),
           ),
         ],
       ),
-
-      // Add a floating action button and experiment with its properties
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Colors.green,
-        focusColor: Colors.blue,
-        foregroundColor: Colors.red,
-        icon: const Icon(Icons.access_alarm),
-        label: const Text(strings.homeFABLabel),
-        mouseCursor: SystemMouseCursors.cell,
-        splashColor: Colors.orange,
-
-        // Show a dummy dialog box when the button is pressed
+        backgroundColor: Colors.blue,
         onPressed: () => showDummyDialog(context),
+        label: const Text('What?'),
+        icon: const Icon(Icons.access_alarm),
+        focusColor: Colors.blue,
+        splashColor: Colors.orange,
+        foregroundColor: Colors.red,
+        mouseCursor: SystemMouseCursors.cell,
       ),
     );
   }
 
-  /// Shows a dummy dialog box with a title and content.
   void showDummyDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        // Build and return an AlertDialog widget
-        return const AlertDialog(
-          title: Text(strings.dummyDialogBoxTitle),
-          content: Text(strings.dummyDialogBoxContent),
+      builder: (BuildContext) {
+        return AlertDialog(
+          title: Text('Hello Darling'),
+          content: Text('This is what I want'),
+        );
+      },
+    );
+  }
+}
+
+class DataSearch extends SearchDelegate<String> {
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [IconButton(icon: Icon(Icons.clear), onPressed: () => query = '')];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(icon: Icon(Icons.arrow_back), onPressed: () => close(context, null));
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return Center(child: Text(query));
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final List<String> suggestions = ['Result 1', 'Result 2', 'Result 3'];
+    final List<String> filteredSuggestions =
+        suggestions.where((suggestion) => suggestion.toLowerCase().contains(query.toLowerCase())).toList();
+
+    return ListView.builder(
+      itemCount: filteredSuggestions.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(filteredSuggestions[index]),
+          onTap: () => showResults(context),
         );
       },
     );
